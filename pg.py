@@ -64,6 +64,13 @@ else:
                     val.type = "absolute"
                     val.type_instance = v
                     val.dispatch()
+                val = collectd.Values(plugin=NAME, type="gauge")
+                val.host = server
+                val.plugin_instance = stat['datname']
+                val.values = [stat['numbackends']]
+                val.type = "gauge"
+                val.type_instance = 'numbackends'
+                val.dispatch()
 
     collectd.register_config(config_callback)
     collectd.register_read(read_callback)
