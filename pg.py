@@ -14,7 +14,7 @@ def stats(uri):
     cur = conn.cursor()
     cur.execute("""SELECT *
                 FROM pg_stat_database
-                WHERE datname NOT LIKE 'template%' ORDER BY datname;""")
+                WHERE datname NOT LIKE 'template%';""")
     for line in cur:
         yield dict(zip(COLUMNS, line))
 
