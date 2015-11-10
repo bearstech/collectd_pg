@@ -88,5 +88,7 @@ else:
 
 if __name__ == "__main__":
     import sys
-    for stat in stats(sys.argv[1]):
+    chrono, s = stats(sys.argv[1])
+    print("Chrono : %f ms" % chrono)
+    for stat in s:
         print(stat)
