@@ -8,6 +8,8 @@ Configure
 
 For now, it uses [pg_stat_database View](http://www.postgresql.org/docs/9.4/static/monitoring-stats.html#PG-STAT-DATABASE-VIEW), don't forget to configure it.
 
+See [PgHero doc](https://github.com/ankane/pghero/blob/master/guides/Query-Stats.md) for complete setup instructions.
+
 ### Collectd configuration file
 
     LoadPlugin Python
