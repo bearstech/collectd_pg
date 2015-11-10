@@ -1,4 +1,5 @@
 from urlparse import urlparse
+import time
 import psycopg2
 
 
@@ -12,11 +13,12 @@ COLUMNS = map(lambda a: a.strip(), "datid |    datname    | numbackends \
 def stats(uri):
     conn = psycopg2.connect(uri)
     cur = conn.cursor()
+    t = time.time()
     cur.execute("""SELECT *
                 FROM pg_stat_database
                 WHERE datname NOT LIKE 'template%';""")
-    for line in cur:
-        yield dict(zip(COLUMNS, line))
+    return (time.time() - t) * 1000, (dict(zip(COLUMNS, line)) for line in cur)
+
 
 try:
     import collectd
@@ -51,7 +53,8 @@ else:
         global uris
         for uri in uris:
             server = urlparse(uri).hostname
-            for stat in stats(uri):
+            chrono, s = stats(uri)
+            for stat in s:
                 for v in ['xact_commit', 'xact_rollback', 'blks_read',
                           'blks_hit', 'tup_returned', 'tup_fetched',
                           'tup_inserted', 'tup_updated', 'tup_deleted',
@@ -71,6 +74,13 @@ else:
                 val.type = "gauge"
                 val.type_instance = 'numbackends'
                 val.dispatch()
+            val = collectd.Values(plugin=NAME, type="absolute")
+            val.host = server
+            val.values = [chrono]
+            val.plugin_instance = "_all"
+            val.type = "absolute"
+            val.type_instance = 'stat_time'
+            val.dispatch()
 
     collectd.register_config(config_callback)
     collectd.register_read(read_callback)
